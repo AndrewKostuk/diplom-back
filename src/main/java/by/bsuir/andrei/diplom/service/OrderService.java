@@ -31,6 +31,7 @@ public class OrderService {
     }
 
     public List<DoctorTicketDto> findAllTicketsBySpecializationAndStatus(Long specId) {
+        //todo: update time of tickets
         List<DoctorTicket> tickets = doctorTicketRepository.findAllByDoctor_Specialization_IdAndStatusAndRoomNumberNot(specId, Status.FREE, 0);
         return DoctorTicketDto.from(tickets);
     }
@@ -48,4 +49,7 @@ public class OrderService {
         return DoctorTicketDto.from(doctorTicketRepository.save(ticket));
     }
 
+    public void cancelDoctorTicket(Long doctorTicketId) {
+        doctorTicketRepository.cancelTicket(doctorTicketId);
+    }
 }

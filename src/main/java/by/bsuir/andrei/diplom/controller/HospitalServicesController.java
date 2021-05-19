@@ -7,6 +7,7 @@ import by.bsuir.andrei.diplom.model.Analysis;
 import by.bsuir.andrei.diplom.model.Procedure;
 import by.bsuir.andrei.diplom.model.User;
 import by.bsuir.andrei.diplom.service.HospitalServicesService;
+import by.bsuir.andrei.diplom.service.PersonalAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 public class HospitalServicesController {
 
     private final HospitalServicesService hospitalServicesService;
+    private final PersonalAccountService personalAccountService;
 
     @GetMapping("/analysis/all")
     public ResponseEntity<List<Analysis>> getAnalyses() {
@@ -58,5 +60,21 @@ public class HospitalServicesController {
         User user = (User) auth.getPrincipal();
         ProcedureTicketDto confirmedTicketDto = hospitalServicesService.confirmProcedure(ticketId, user);
         return new ResponseEntity<>(confirmedTicketDto, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/analysis/free/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<List<AnalysisTicketDto>> cancelAnalysisTicket(@PathVariable("id") Long analysisTicketId, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        hospitalServicesService.cancelAnalysisTicket(analysisTicketId);
+        List<AnalysisTicketDto> tickets = personalAccountService.getActualAnalysisTickets(user.getId());
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/procedure/free/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<List<ProcedureTicketDto>> cancelProcedureTicket(@PathVariable("id") Long procedureTicketId, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        hospitalServicesService.cancelProcedureTicket(procedureTicketId);
+        List<ProcedureTicketDto> tickets = personalAccountService.getActualProcedureTickets(user.getId());
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 }

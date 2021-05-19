@@ -54,4 +54,12 @@ public class HospitalServicesService {
         ticket.setStatus(Status.RESERVED);
         return ProcedureTicketDto.from(procedureTicketRepository.save(ticket));
     }
+
+    public void cancelAnalysisTicket(Long analysisTicketId) {
+        analysisTicketRepository.cancelTicket(analysisTicketId);
+    }
+
+    public void cancelProcedureTicket(Long procedureTicketId) {
+        procedureTicketRepository.cancelTicket(procedureTicketId);
+    }
 }

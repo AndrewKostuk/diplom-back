@@ -4,6 +4,7 @@ import by.bsuir.andrei.diplom.dto.DoctorTicketDto;
 import by.bsuir.andrei.diplom.dto.SpecializationDto;
 import by.bsuir.andrei.diplom.model.User;
 import by.bsuir.andrei.diplom.service.OrderService;
+import by.bsuir.andrei.diplom.service.PersonalAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
     private final OrderService orderService;
+    private final PersonalAccountService personalAccountService;
 
     @GetMapping("/all")
     public ResponseEntity<List<SpecializationDto>> getAllSpecializations() {
@@ -42,10 +44,18 @@ public class OrderController {
         return new ResponseEntity<>(ticketsDto, HttpStatus.OK);
     }
 
-    @PutMapping("/confirm/{ticketId}")
+    @RequestMapping(value = "/confirm/{ticketId}", method = RequestMethod.PUT)
     public ResponseEntity<DoctorTicketDto> makeOrder(@PathVariable Long ticketId, Authentication auth) {
         User user = (User) auth.getPrincipal();
         DoctorTicketDto confirmedTicketDto = orderService.confirmTicket(ticketId, user);
         return new ResponseEntity<>(confirmedTicketDto, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/free/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<List<DoctorTicketDto>> cancelDoctorTicket(@PathVariable("id") Long doctorTicketId, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        orderService.cancelDoctorTicket(doctorTicketId);
+        List<DoctorTicketDto> tickets = personalAccountService.getActualDoctorTickets(user.getId());
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 }

@@ -24,8 +24,13 @@ public class PersonalAccountService {
     private final ProcedureTicketRepository procedureTicketRepository;
 
     public UserProfileDto getProfile(User user) {
-        if (user.getUserProfile() == null) return null;
-        else {
+        if (user.getUserProfile() == null) {
+            UserProfileDto u = new UserProfileDto();
+            u.setFirstName(user.getFirstName());
+            u.setLastName(user.getLastName());
+            u.setPatronymic(user.getPatronymic());
+            return u;
+        } else {
             user.getUserProfile().setUser(user);
             return UserProfileDto.from(user.getUserProfile());
         }
@@ -33,8 +38,9 @@ public class PersonalAccountService {
 
     public UserProfileDto updateOrSaveProfile(UserProfileDto userProfileDto, User user) {
         UserProfile userProfile = UserProfileDto.to(userProfileDto);
-        City city = cityRepository.findByName(userProfileDto.getCity()).orElseThrow(() ->
-                new IllegalStateException("city not found by name " + userProfileDto.getCity()));
+        City city = cityRepository.findByName(userProfileDto.getCity()).orElse(null);
+//        .orElseThrow(() ->
+//                new IllegalStateException("city not found by name " + userProfileDto.getCity()));
         userProfile.setCity(city);
         userProfile.setUser(user);
         UserProfile savedUserProfile = userProfileRepository.save(userProfile);
@@ -52,28 +58,46 @@ public class PersonalAccountService {
     }
 
     public Map<String, Object> getPlannedVisits(User user) {
-        List<DoctorTicket> doctorTickets = doctorTicketRepository.findAllByUser_Id(user.getId());
-        updateDoctorTickets(doctorTickets);
-        List<DoctorTicket> plannedDoctorTickets = doctorTickets.stream().filter(doctorTicket -> doctorTicket.getStatus().equals(Status.RESERVED) && doctorTicket.getRoomNumber() != 0).collect(Collectors.toList());
-        List<DoctorTicket> homeTickets = doctorTickets.stream().filter(doctorTicket -> doctorTicket.getStatus().equals(Status.RESERVED) && doctorTicket.getRoomNumber() == 0).collect(Collectors.toList());
-
-        List<AnalysisTicket> analysisTickets = analysisTicketRepository.findAllByUser_Id(user.getId());
-        updateAnalysisTickets(analysisTickets);
-        List<AnalysisTicket> plannedAnalysisTickets = analysisTickets.stream().filter(analysisTicket -> analysisTicket.getStatus().equals(Status.RESERVED)).collect(Collectors.toList());
-
-        List<ProcedureTicket> procedureTickets = procedureTicketRepository.findAllByUser_Id(user.getId());
-        updateProcedureTickets(procedureTickets);
-        List<ProcedureTicket> plannedProcedureTickets = procedureTickets.stream().filter(procedureTicket -> procedureTicket.getStatus().equals(Status.RESERVED)).collect(Collectors.toList());
-
+        Long userId = user.getId();
         Map<String, Object> response = new HashMap<>();
-        response.put("tickets", DoctorTicketDto.from(plannedDoctorTickets));
-        response.put("home", DoctorTicketDto.from(homeTickets));
-        response.put("analyses", AnalysisTicketDto.from(plannedAnalysisTickets));
-        response.put("procedure", ProcedureTicketDto.from(plannedProcedureTickets));
+        response.put("tickets", getActualDoctorTickets(userId));
+        response.put("home", getActualHomeTickets(userId));
+        response.put("analyses", getActualAnalysisTickets(userId));
+        response.put("procedure", getActualProcedureTickets(userId));
         return response;
     }
 
-    private void updateDoctorTickets(List<DoctorTicket> tickets) {
+    public List<DoctorTicketDto> getActualDoctorTickets(Long userId) {
+        List<DoctorTicket> doctorTickets = doctorTicketRepository.findAllByUser_Id(userId);
+        updateDoctorTickets(doctorTickets);
+        List<DoctorTicket> plannedDoctorTickets = doctorTickets.stream().filter(doctorTicket -> doctorTicket.getStatus().equals(Status.RESERVED) && doctorTicket.getRoomNumber() != 0).collect(Collectors.toList());
+        return DoctorTicketDto.from(plannedDoctorTickets);
+    }
+
+    public List<DoctorTicketDto> getActualHomeTickets(Long userId) {
+        List<DoctorTicket> doctorTickets = doctorTicketRepository.findAllByUser_Id(userId);
+        updateDoctorTickets(doctorTickets);
+        List<DoctorTicket> homeTickets = doctorTickets.stream().filter(doctorTicket -> doctorTicket.getStatus().equals(Status.RESERVED) && doctorTicket.getRoomNumber() == 0).collect(Collectors.toList());
+        return DoctorTicketDto.from(homeTickets);
+    }
+
+    public List<AnalysisTicketDto> getActualAnalysisTickets(Long userId) {
+        List<AnalysisTicket> analysisTickets = analysisTicketRepository.findAllByUser_Id(userId);
+        updateAnalysisTickets(analysisTickets);
+        List<AnalysisTicket> plannedAnalysisTickets = analysisTickets.stream().filter(analysisTicket -> analysisTicket.getStatus().equals(Status.RESERVED)).collect(Collectors.toList());
+        return AnalysisTicketDto.from(plannedAnalysisTickets);
+    }
+
+
+    public List<ProcedureTicketDto> getActualProcedureTickets(Long userId) {
+        List<ProcedureTicket> procedureTickets = procedureTicketRepository.findAllByUser_Id(userId);
+        updateProcedureTickets(procedureTickets);
+        List<ProcedureTicket> plannedProcedureTickets = procedureTickets.stream().filter(procedureTicket -> procedureTicket.getStatus().equals(Status.RESERVED)).collect(Collectors.toList());
+        return ProcedureTicketDto.from(plannedProcedureTickets);
+    }
+
+
+    public void updateDoctorTickets(List<DoctorTicket> tickets) {
         if (tickets != null && !tickets.isEmpty()) {
             for (BaseTicket ticket : tickets) {
                 if (ticket.getDateTime().isBefore(LocalDateTime.now())) ticket.setStatus(Status.FINISHED);

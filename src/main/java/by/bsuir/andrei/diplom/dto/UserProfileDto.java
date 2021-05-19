@@ -27,6 +27,8 @@ public class UserProfileDto extends BaseEntity {
     private LocalDate birthDate;
     private Gender gender;
 
+    public interface Existing {
+    }
     public static UserProfileDto from(UserProfile userProfile) {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setId(userProfile.getId());

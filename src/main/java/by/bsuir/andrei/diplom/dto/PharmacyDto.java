@@ -14,14 +14,18 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class PharmacyDto extends BaseEntity {
     private String name;
+    private Integer dose;
     private Integer amountPerDay;
+    private Integer courseDuration;
     private String food;
 
     public static PharmacyDto from(VisitPharmacy pharmacy) {
         PharmacyDto pharmacyDto = new PharmacyDto();
         pharmacyDto.setId(pharmacy.getPharmacy().getId());
         pharmacyDto.setName(pharmacy.getPharmacy().getName());
+        pharmacyDto.setDose(pharmacy.getDose());
         pharmacyDto.setAmountPerDay(pharmacy.getAmountPerDay());
+        pharmacyDto.setCourseDuration(pharmacy.getCourseDuration());
         pharmacyDto.setFood(pharmacy.getFood().name());
         return pharmacyDto;
     }

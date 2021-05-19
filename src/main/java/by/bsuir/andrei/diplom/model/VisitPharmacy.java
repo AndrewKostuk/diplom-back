@@ -27,10 +27,11 @@ public class VisitPharmacy implements Serializable {
     @MapsId("pharmacy_id")
     private Pharmacy pharmacy;
 
+    private Integer dose;
     private Integer amountPerDay;
-
     @Enumerated(EnumType.STRING)
     private Food food;
+    private Integer courseDuration;
 
     @Override
     public boolean equals(Object o) {
