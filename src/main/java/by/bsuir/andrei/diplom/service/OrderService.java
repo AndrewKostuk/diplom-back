@@ -20,23 +20,23 @@ public class OrderService {
     private final SpecializationRepository specializationRepository;
     private final DoctorTicketRepository doctorTicketRepository;
 
-    public List<SpecializationDto> findAllSpecialities() {
+    public List<SpecializationDto> getAllSpecs() {
         List<Specialization> specializations = specializationRepository.findAll();
         return SpecializationDto.from(specializations);
     }
 
-    public List<SpecializationDto> findAllHouseCallSpecializations() {
+    public List<SpecializationDto> getAllHouseSpec() {
         List<Specialization> houseCallSpecializations = specializationRepository.findAllByDoctors_HouseCall(true);
         return SpecializationDto.from(houseCallSpecializations);
     }
 
-    public List<DoctorTicketDto> findAllTicketsBySpecializationAndStatus(Long specId) {
+    public List<DoctorTicketDto> getAllTicketsBySpec(Long specId) {
         //todo: update time of tickets
         List<DoctorTicket> tickets = doctorTicketRepository.findAllByDoctor_Specialization_IdAndStatusAndRoomNumberNot(specId, Status.FREE, 0);
         return DoctorTicketDto.from(tickets);
     }
 
-    public List<DoctorTicketDto> findAllHouseCallTicketsBySpecializationAndStatus(Long specId) {
+    public List<DoctorTicketDto> getAllHouseTicketsBySpec(Long specId) {
         List<DoctorTicket> tickets = doctorTicketRepository.findAllByDoctor_Specialization_Id_AndDoctor_HouseCallAndStatus(specId, true, Status.FREE);
         return DoctorTicketDto.from(tickets);
     }
@@ -49,7 +49,7 @@ public class OrderService {
         return DoctorTicketDto.from(doctorTicketRepository.save(ticket));
     }
 
-    public void cancelDoctorTicket(Long doctorTicketId) {
+    public void cancelTicket(Long doctorTicketId) {
         doctorTicketRepository.cancelTicket(doctorTicketId);
     }
 }

@@ -22,11 +22,6 @@ public class Shift extends BaseEntity {
     @OneToMany(mappedBy = "shift")
     private List<Doctor> doctors = new ArrayList<>();
 
-    public Shift(LocalTime startTime, LocalTime endTime) {
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-
     @Override
     public String toString() {
         return "Shift{" +

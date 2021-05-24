@@ -21,26 +21,26 @@ public class OrderController {
     private final PersonalAccountService personalAccountService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<SpecializationDto>> getAllSpecializations() {
-        List<SpecializationDto> specsDto = orderService.findAllSpecialities();
+    public ResponseEntity<List<SpecializationDto>> getAllSpecs() {
+        List<SpecializationDto> specsDto = orderService.getAllSpecs();
         return new ResponseEntity<>(specsDto, HttpStatus.OK);
     }
 
     @GetMapping("/house/all")
-    public ResponseEntity<List<SpecializationDto>> getAllHouseSpecializations() {
-        List<SpecializationDto> specsDto = orderService.findAllHouseCallSpecializations();
+    public ResponseEntity<List<SpecializationDto>> getAllHouseSpecs() {
+        List<SpecializationDto> specsDto = orderService.getAllHouseSpec();
         return new ResponseEntity<>(specsDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<DoctorTicketDto>> getAllTicketsBySpecialization(@PathVariable("id") Long specId) {
-        List<DoctorTicketDto> ticketsDto = orderService.findAllTicketsBySpecializationAndStatus(specId);
+    public ResponseEntity<List<DoctorTicketDto>> getAllTicketsBySpec(@PathVariable("id") Long specId) {
+        List<DoctorTicketDto> ticketsDto = orderService.getAllTicketsBySpec(specId);
         return new ResponseEntity<>(ticketsDto, HttpStatus.OK);
     }
 
     @GetMapping("/house/{id}")
-    public ResponseEntity<List<DoctorTicketDto>> getAllHouseTicketsBySpecialization(@PathVariable("id") Long specId) {
-        List<DoctorTicketDto> ticketsDto = orderService.findAllHouseCallTicketsBySpecializationAndStatus(specId);
+    public ResponseEntity<List<DoctorTicketDto>> getAllHouseTicketsBySpec(@PathVariable("id") Long specId) {
+        List<DoctorTicketDto> ticketsDto = orderService.getAllHouseTicketsBySpec(specId);
         return new ResponseEntity<>(ticketsDto, HttpStatus.OK);
     }
 
@@ -52,9 +52,9 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/free/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<List<DoctorTicketDto>> cancelDoctorTicket(@PathVariable("id") Long doctorTicketId, Authentication auth) {
+    public ResponseEntity<List<DoctorTicketDto>> cancelTicket(@PathVariable("id") Long doctorTicketId, Authentication auth) {
         User user = (User) auth.getPrincipal();
-        orderService.cancelDoctorTicket(doctorTicketId);
+        orderService.cancelTicket(doctorTicketId);
         List<DoctorTicketDto> tickets = personalAccountService.getActualDoctorTickets(user.getId());
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }

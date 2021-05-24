@@ -55,11 +55,11 @@ public class HospitalServicesService {
         return ProcedureTicketDto.from(procedureTicketRepository.save(ticket));
     }
 
-    public void cancelAnalysisTicket(Long analysisTicketId) {
+    public void cancelAnalysis(Long analysisTicketId) {
         analysisTicketRepository.cancelTicket(analysisTicketId);
     }
 
-    public void cancelProcedureTicket(Long procedureTicketId) {
+    public void cancelProcedure(Long procedureTicketId) {
         procedureTicketRepository.cancelTicket(procedureTicketId);
     }
 }

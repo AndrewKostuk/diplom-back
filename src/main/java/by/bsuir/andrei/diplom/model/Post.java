@@ -22,10 +22,6 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<Doctor> doctors = new ArrayList<>();
 
-    public Post(String name) {
-        this.name = name;
-    }
-
     @Override
     public String toString() {
         return "Post{" +

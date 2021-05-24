@@ -95,7 +95,7 @@ public class User extends NamedEntity implements UserDetails {
                 "email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", userProfile=" + userProfile +
-                ", role=" + role.toString() +
+                ", role=" + (role == null ? "null" : role.toString()) +
                 ", locked=" + locked +
                 ", enabled=" + enabled +
                 '}';

@@ -19,8 +19,8 @@ import java.util.UUID;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ConfirmationTokenService confirmationTokenService;
+    private final BCryptPasswordEncoder encoder;
+    private final ConfirmationTokenService cts;
 
     private final static String USER_NOT_FOUND_MESSAGE = "User with email %s not found";
 
@@ -37,7 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             if (user.getFirstName().equals(existingUser.getFirstName())
                     && user.getLastName().equals(existingUser.getLastName())
                     && user.getPatronymic().equals(existingUser.getPatronymic())) {
-                if (!bCryptPasswordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+                if (!encoder.matches(user.getPassword(), existingUser.getPassword())) {
                     throw new IllegalStateException("wrong password");
                 }
                 if (existingUser.getEnabled()) {
@@ -48,7 +48,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 throw new IllegalStateException("email is already taken");
             }
         } else {
-            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+            String encodedPassword = encoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
             userRepository.save(user);
         }
@@ -60,7 +60,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 createdAt.plusMinutes(15),
                 user
         );
-        confirmationTokenService.saveConfirmationToken(confirmationToken);
+        cts.saveConfirmationToken(confirmationToken);
 
         return token;
     }

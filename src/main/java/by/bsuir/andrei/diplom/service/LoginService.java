@@ -13,14 +13,21 @@ import java.util.Optional;
 @AllArgsConstructor
 public class LoginService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder encoder;
 
     public boolean findRegisteredUser(LoginDto loginDto) {
         Optional<User> userOptional = userRepository.findByEmail(loginDto.getUsername());
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-            return existingUser.getEnabled() && bCryptPasswordEncoder.matches(loginDto.getPassword(), existingUser.getPassword());
+            if(!existingUser.getEnabled()){
+                throw new IllegalStateException("you did not confirm your email");
+            }
+            if(!encoder.matches(loginDto.getPassword(), existingUser.getPassword())){
+                throw new IllegalStateException("wrong password");
+            }
+            return true;
         }
-        return false;
+        throw new IllegalStateException("email not found");
+
     }
 }

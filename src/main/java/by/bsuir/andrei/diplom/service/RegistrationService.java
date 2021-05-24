@@ -17,7 +17,7 @@ public class RegistrationService {
     private final EmailValidator emailValidator;
     private final UserDetailsServiceImpl userDetailsService;
     private final RoleRepository roleRepository;
-    private final ConfirmationTokenService confirmationTokenService;
+    private final ConfirmationTokenService cts;
     private final EmailSender emailSender;
 
     public String register(RegistrationRequest request) {
@@ -54,7 +54,7 @@ public class RegistrationService {
 
     @Transactional
     public String confirmToken(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenService
+        ConfirmationToken confirmationToken = cts
                 .getToken(token)
                 .orElseThrow(() ->
                         new IllegalStateException("token not found"));
@@ -69,7 +69,7 @@ public class RegistrationService {
             throw new IllegalStateException("token expired. Try to register again");
         }
 
-        confirmationTokenService.setConfirmedAt(token);
+        cts.setConfirmedAt(token);
         userDetailsService.enableUser(
                 confirmationToken.getUser().getEmail());
         return "confirmed";
