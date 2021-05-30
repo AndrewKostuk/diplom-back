@@ -26,7 +26,6 @@ public class SpecializationDto extends BaseEntity {
         return specialization.stream().map(SpecializationDto::from).collect(Collectors.toList());
     }
 
-
     public static Specialization to(SpecializationDto specializationDto) {
         Specialization specialization = new Specialization();
         specialization.setId(specializationDto.getId());
@@ -34,7 +33,3 @@ public class SpecializationDto extends BaseEntity {
         return specialization;
     }
 }
-
-
-
-

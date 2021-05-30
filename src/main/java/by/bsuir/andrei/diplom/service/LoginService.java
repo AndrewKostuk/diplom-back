@@ -19,10 +19,10 @@ public class LoginService {
         Optional<User> userOptional = userRepository.findByEmail(loginDto.getUsername());
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-            if(!existingUser.getEnabled()){
+            if (!existingUser.getEnabled()) {
                 throw new IllegalStateException("you did not confirm your email");
             }
-            if(!encoder.matches(loginDto.getPassword(), existingUser.getPassword())){
+            if (!encoder.matches(loginDto.getPassword(), existingUser.getPassword())) {
                 throw new IllegalStateException("wrong password");
             }
             return true;
