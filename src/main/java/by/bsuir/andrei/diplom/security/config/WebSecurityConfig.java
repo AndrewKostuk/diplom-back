@@ -31,6 +31,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .permitAll()
                 .antMatchers("/login")
                 .permitAll()
+                .antMatchers("/pharmacy")
+                .permitAll()
+                .antMatchers("/contact")
+                .permitAll()
                 .anyRequest()
                 .authenticated();
 //                .and()

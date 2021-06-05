@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class WorkingTime extends BaseEntity {
     private String day;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

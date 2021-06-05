@@ -10,6 +10,7 @@ import by.bsuir.andrei.diplom.repository.ProcedureTicketRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,12 +32,32 @@ public class HospitalServicesService {
 
     public List<AnalysisTicketDto> findAllAnalysisTickets(Long analysisId) {
         List<AnalysisTicket> analysisTickets = analysisTicketRepository.findAllByAnalysis_IdAndStatus(analysisId, Status.FREE);
+        updateAnalysisTickets(analysisTickets);
         return AnalysisTicketDto.from(analysisTickets);
+    }
+
+    private void updateAnalysisTickets(List<AnalysisTicket> tickets) {
+        if (tickets != null && !tickets.isEmpty()) {
+            for (BaseTicket ticket : tickets) {
+                if (ticket.getDateTime().isBefore(LocalDateTime.now())) ticket.setStatus(Status.FINISHED);
+            }
+            analysisTicketRepository.saveAll(tickets);
+        }
     }
 
     public List<ProcedureTicketDto> findAllProcedureTickets(Long procedureId) {
         List<ProcedureTicket> procedureTicket = procedureTicketRepository.findAllByProcedure_IdAndStatus(procedureId, Status.FREE);
+        updateProcedureTickets(procedureTicket);
         return ProcedureTicketDto.from(procedureTicket);
+    }
+
+    private void updateProcedureTickets(List<ProcedureTicket> tickets) {
+        if (tickets != null && !tickets.isEmpty()) {
+            for (BaseTicket ticket : tickets) {
+                if (ticket.getDateTime().isBefore(LocalDateTime.now())) ticket.setStatus(Status.FINISHED);
+            }
+            procedureTicketRepository.saveAll(tickets);
+        }
     }
 
     public AnalysisTicketDto confirmAnalysis(Long ticketId, User user) {

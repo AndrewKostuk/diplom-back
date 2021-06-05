@@ -2,15 +2,13 @@ package by.bsuir.andrei.diplom.service;
 
 import by.bsuir.andrei.diplom.dto.DoctorTicketDto;
 import by.bsuir.andrei.diplom.dto.SpecializationDto;
-import by.bsuir.andrei.diplom.model.DoctorTicket;
-import by.bsuir.andrei.diplom.model.Specialization;
-import by.bsuir.andrei.diplom.model.Status;
-import by.bsuir.andrei.diplom.model.User;
+import by.bsuir.andrei.diplom.model.*;
 import by.bsuir.andrei.diplom.repository.DoctorTicketRepository;
 import by.bsuir.andrei.diplom.repository.SpecializationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,13 +29,14 @@ public class OrderService {
     }
 
     public List<DoctorTicketDto> getAllTicketsBySpec(Long specId) {
-        //todo: update time of tickets
         List<DoctorTicket> tickets = doctorTicketRepository.findAllByDoctor_Specialization_IdAndStatusAndRoomNumberNot(specId, Status.FREE, 0);
+        updateDoctorTickets(tickets);
         return DoctorTicketDto.from(tickets);
     }
 
     public List<DoctorTicketDto> getAllHouseTicketsBySpec(Long specId) {
         List<DoctorTicket> tickets = doctorTicketRepository.findAllByDoctor_Specialization_Id_AndDoctor_HouseCallAndStatus(specId, true, Status.FREE);
+        updateDoctorTickets(tickets);
         return DoctorTicketDto.from(tickets);
     }
 
@@ -51,5 +50,14 @@ public class OrderService {
 
     public void cancelTicket(Long doctorTicketId) {
         doctorTicketRepository.cancelTicket(doctorTicketId);
+    }
+
+    public void updateDoctorTickets(List<DoctorTicket> tickets) {
+        if (tickets != null && !tickets.isEmpty()) {
+            for (BaseTicket ticket : tickets) {
+                if (ticket.getDateTime().isBefore(LocalDateTime.now())) ticket.setStatus(Status.FINISHED);
+            }
+            doctorTicketRepository.saveAll(tickets);
+        }
     }
 }
